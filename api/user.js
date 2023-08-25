@@ -1,7 +1,7 @@
 import express from "express";
 import User from "./../models/User";
 import PasswordReset from "./../models/PasswordReset";
-import uuidv4 from "uuidv4";
+import { v4 as uuidv4 } from "uuid";
 import nodemailer from "nodemailer";
 
 const router = express.Router();
@@ -69,7 +69,7 @@ router.post("/signup", (req, res) => {
           const newUser = new User({
             name,
             email,
-            password, // Store plain password
+            password,
             expiryDate: new Date().getTime(),
             verified: false,
           });
@@ -100,50 +100,6 @@ router.post("/signup", (req, res) => {
       });
   }
 });
-
-// Signin
-// router.post("/signin", (req, res) => {
-//   let { email, password } = req.body;
-//   email = email.trim();
-//   password = password.trim();
-
-//   if (email == "" || password == "") {
-//     res.json({
-//       status: "FAILED",
-//       message: "Empty credentials supplied",
-//     });
-//   } else {
-//     User.find({ email })
-//       .then((data) => {
-//         if (data.length) {
-//           const storedPassword = data[0].password;
-//           if (password === storedPassword) {
-//             res.json({
-//               status: "SUCCESS",
-//               message: "Signin Successful",
-//               data: data,
-//             });
-//           } else {
-//             res.json({
-//               status: "FAILED",
-//               message: "Invalid password entered!",
-//             });
-//           }
-//         } else {
-//           res.json({
-//             status: "FAILED",
-//             message: "Invalid credentials entered!",
-//           });
-//         }
-//       })
-//       .catch((err) => {
-//         res.json({
-//           status: "FAILED",
-//           message: "An error occurred while checking for existing user",
-//         });
-//       });
-//   }
-// });
 
 router.post("/signin", (req, res) => {
   let { email, password } = req.body;
@@ -188,8 +144,6 @@ router.post("/signin", (req, res) => {
   }
 });
 
-// password reset stuff
-
 router.post("/requestPasswordReset", (req, res) => {
   const { email, redirectUrl } = req.body;
 
@@ -197,7 +151,7 @@ router.post("/requestPasswordReset", (req, res) => {
     .then((data) => {
       if (data.length) {
         if (!data[0].verified) {
-          res.json({
+          res.status(401).json({
             status: "FAILED",
             message: "Email hasn't been verified yet. Check your inbox",
           });
@@ -215,13 +169,13 @@ router.post("/requestPasswordReset", (req, res) => {
       console.log(err);
       res.json({
         status: "FAILED",
-        message: "An error occurred while checking for existing user",
+        message: "An error occurred while checking for an existing user",
       });
     });
 });
 
 const sendResetEmail = ({ _id, email }, redirectUrl, res) => {
-  const resetString = `${uuidv4()}-${_id}`;
+  const resetString = uuidv4() + _id;
 
   PasswordReset.deleteMany({ userId: _id })
     .then((result) => {
@@ -234,12 +188,11 @@ const sendResetEmail = ({ _id, email }, redirectUrl, res) => {
         <a href=${redirectUrl + "/" + _id + "/" + resetString}>
         here</a> to proceed.</p>`,
       };
-      // No need to hash the reset string here
       const newPasswordReset = new PasswordReset({
         userId: _id,
         resetString: resetString, // Store plain reset string
         createdAt: new Date(),
-        expiresAt: new Date().getTime() + 360000,
+        expiresAt: new Date().getTime() + 3600000, // 1 hour expiration
       });
       newPasswordReset
         .save()
@@ -276,5 +229,81 @@ const sendResetEmail = ({ _id, email }, redirectUrl, res) => {
       });
     });
 };
+
+// Actually reset the password
+
+router.post("/resetPassword", (req, res) => {
+  let { userId, resetString, newPassword } = req.body;
+
+  PasswordReset.find({ userId })
+    .then((result) => {
+      if (result.length > 0) {
+        // password reset record exists so we proceed
+
+        const { expiresAt } = result[0];
+
+        // chekcing for expire reset string
+        if (expiresAt < Date.now()) {
+          PasswordReset.deleteOne({ userId })
+            .then(() => {
+              res.json({
+                status: "FAILED",
+                message: "Password reset link has expired",
+              });
+            })
+            .catch(() => {
+              res.json({
+                status: "FAILED",
+                message: "Clearing password reset record failed",
+              });
+            });
+        } else {
+          if (result) {
+            User.updateOne({ _id: userId }, { password: newPassword })
+              .then(() => {
+                PasswordReset.deleteOne({ userId })
+                  .then(() => {
+                    res.json({
+                      status: "SUCCESS",
+                      message: "Password has been reset successfully",
+                    });
+                  })
+                  .catch(() => {
+                    res.json({
+                      status: "FAILED",
+                      message:
+                        "An error occurred while finalizing password reset",
+                    });
+                  });
+              })
+              .catch(() => {
+                res.json({
+                  status: "FAILED",
+                  message: "Updating user password failed",
+                });
+              });
+          } else {
+            res.json({
+              status: "FAILED",
+              message: "Invalid password reset details passed",
+            });
+          }
+        }
+      } else {
+        // password reset record doesn't exist
+        res.json({
+          status: "FAILED",
+          message: "Password reset record request not found",
+        });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.json({
+        status: "FAILED",
+        message: "Checking for existing password reset record failed",
+      });
+    });
+});
 
 module.exports = router;
