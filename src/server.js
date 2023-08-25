@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 const PORT = 3000;
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: "https://github.com/AHMED6011/front-end.git",
   methods: "GET,POST",
   allowedHeaders: "Content-Type",
 };
@@ -20,5 +20,7 @@ app.use(cors(corsOptions));
 app.use("/user", UserRouter);
 
 app.listen(PORT, () => {
-  console.log(`Server is listening on port: http://localhost${PORT}`);
+  console.log(
+    `Server is listening on port: https://github.com/AHMED6011/front-end.git`
+  );
 });
