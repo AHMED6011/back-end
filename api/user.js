@@ -192,7 +192,7 @@ const sendResetEmail = ({ _id, email }, redirectUrl, res) => {
         userId: _id,
         resetString: resetString, // Store plain reset string
         createdAt: new Date(),
-        expiresAt: new Date().getTime() + 3600000, // 1 hour expiration
+        expiresAt: new Date().getTime() + 36000, 
       });
       newPasswordReset
         .save()
