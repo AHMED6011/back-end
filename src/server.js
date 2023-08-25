@@ -10,8 +10,8 @@ app.use(bodyParser.json());
 const PORT = 3000;
 
 const corsOptions = {
-  origin: "http://localhost:5173",
-  methods: "GET,POST,DELETE",
+  origin: "https://ahmed6011.github.io/back-end",
+  methods: "GET,POST",
   allowedHeaders: "Content-Type",
 };
 
