@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 const PORT = 3000;
 
 const corsOptions = {
-  origin: "https://github.com/AHMED6011/front-end.git",
+  origin: "https://front-end-two-weld.vercel.app",
   methods: "GET,POST",
   allowedHeaders: "Content-Type",
 };
@@ -21,6 +21,6 @@ app.use("/user", UserRouter);
 
 app.listen(PORT, () => {
   console.log(
-    `Server is listening on port: https://github.com/AHMED6011/front-end.git`
+    `Server is listening on port: https://front-end-two-weld.vercel.app/user/signup`
   );
 });
