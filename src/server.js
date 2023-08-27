@@ -7,7 +7,6 @@ import cors from "cors";
 const app = express();
 
 app.use(bodyParser.json());
-const PORT = 3000;
 
 const corsOptions = {
   origin: "https://front-end-umber-sigma.vercel.app",
@@ -19,12 +18,12 @@ app.use(cors(corsOptions));
 
 app.use("/user", UserRouter);
 
+const PORT = process.env.PORT || 3000;
+
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
 app.listen(PORT, () => {
-  console.log(
-    `Server is listening on port: https://front-end-two-weld.vercel.app`
-  );
+  console.log(`Server is listening on port: ${PORT}`);
 });
