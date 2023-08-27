@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 const PORT = 3000;
 
 const corsOptions = {
-  origin: "https://front-end-two-weld.vercel.app",
+  origin: "https://front-end-umber-sigma.vercel.app",
   methods: "GET,POST",
   allowedHeaders: "Content-Type",
 };
@@ -25,6 +25,6 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(
-    `Server is listening on port: https://front-end-two-weld.vercel.app/user/signup`
+    `Server is listening on port: https://front-end-two-weld.vercel.app`
   );
 });
