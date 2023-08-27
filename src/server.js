@@ -9,7 +9,7 @@ const app = express();
 app.use(bodyParser.json());
 
 const corsOptions = {
-  origin: "https://front-end-umber-sigma.vercel.app",
+  origin: "https://front-end-kohl-ten.vercel.app/",
   methods: "GET,POST",
   allowedHeaders: "Content-Type",
 };
