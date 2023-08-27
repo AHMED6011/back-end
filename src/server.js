@@ -8,13 +8,13 @@ const app = express();
 
 app.use(bodyParser.json());
 
-const corsOptions = {
-  origin: "https://front-end-kohl-ten.vercel.app/",
-  methods: "GET,POST",
-  allowedHeaders: "Content-Type",
-};
+// const corsOptions = {
+//   origin: "https://front-end-kohl-ten.vercel.app/",
+//   methods: "GET,POST",
+//   allowedHeaders: "Content-Type",
+// };
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use("/user", UserRouter);
 
