@@ -19,6 +19,10 @@ app.use(cors(corsOptions));
 
 app.use("/user", UserRouter);
 
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
+
 app.listen(PORT, () => {
   console.log(
     `Server is listening on port: https://front-end-two-weld.vercel.app/user/signup`
