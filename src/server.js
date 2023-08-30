@@ -8,15 +8,15 @@ const app = express();
 
 app.use(bodyParser.json());
 
-const corsOptions = {
-  origin: "https://riad-front-end.vercel.app",
-  methods: "GET,POST",
-  allowedHeaders: "Content-Type",
-};
+// const corsOptions = {
+//   origin: "https://riad-front-end.vercel.app",
+//   methods: "GET,POST",
+//   allowedHeaders: "Content-Type",
+// };
 
 app.use(cors());
 
-app.use("/api", UserRouter);
+app.use("/user", UserRouter);
 
 const PORT = process.env.PORT || 3000;
 
